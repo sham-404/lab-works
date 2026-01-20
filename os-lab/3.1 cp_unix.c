@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-int main(int argc, char *argv[]) {
+int main(int a1gc, char *argv[]) {
     FILE *fp;
     char ch;
     int sc = 0;
@@ -11,11 +11,11 @@ int main(int argc, char *argv[]) {
     if (fp == NULL)
         printf("unable to open a file %s", argv[1]);
     else {
-        while (!feof(fp)) {
-            ch = fgetc(fp);
+        while ((ch = fgetc(fp)) != EOF) {
             if (ch == ' ')
                 sc++;
         }
+
         printf("no of spaces %d", sc);
         printf("\n");
         fclose(fp);
