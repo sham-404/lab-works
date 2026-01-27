@@ -17,7 +17,7 @@ int main() {
     printf("\n Enter the no of process: ");
     scanf("%d", &n);
 
-    p = (sp *)malloc(sizeof(sp));
+    p = (sp *)malloc(sizeof(sp) * n);
     printf("Enter the burst time and priority: \n");
 
     for (i = 0; i < n; i++) {
