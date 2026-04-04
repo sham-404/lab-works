@@ -1,41 +1,38 @@
-#include <pthread.h>
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 
-pthread_t tid[2];
-int counter;
-pthread_mutex_t lock;
+int main() {
+    int page_table[10];
+    int logical_address, page_number, offset;
+    int page_size, frame_number, physical_address;
+    int n, i;
 
-void *doSomeThing(void *arg) {
-    pthread_mutex_lock(&lock);
-    unsigned long i = 0;
-    counter += 1;
-    printf("\n Job %d started\n", counter);
-    for (i = 0; i < (0xFFFFFFFF); i++)
-        ;
-    printf("\n Job %d finished\n", counter);
-    pthread_mutex_unlock(&lock);
-    return NULL;
-}
+    printf("Enter the number of pages: ");
+    scanf("%d", &n);
+    printf("Enter the page table (frame numbers):\n");
 
-int main(void) {
-    int i = 0;
-    int err;
-    if (pthread_mutex_init(&lock, NULL) != 0) {
-        printf("\n mutex init failed\n");
-        return 1;
+    for (i = 0; i < n; i++) {
+        printf("Page %d -> Frame: ", i);
+        scanf("%d", &page_table[i]);
     }
 
-    while (i < 2) {
-        err = pthread_create(&(tid[i]), NULL, &doSomeThing, NULL);
-        if (err != 0)
-            printf("\ncan't create thread :[%s]", strerror(err));
-        i++;
+    printf("Enter the page size: ");
+    scanf("%d", &page_size);
+    printf("Enter the logical address: ");
+    scanf("%d", &logical_address);
+
+    page_number = logical_address / page_size;
+    offset = logical_address % page_size;
+
+    if (page_number >= n) {
+        printf("Invalid Page Number\n");
+    } else {
+        frame_number = page_table[page_number];
+        physical_address = (frame_number * page_size) + offset;
+        printf("\nPage Number: %d\n", page_number);
+        printf("Offset: %d\n", offset);
+        printf("Frame Number: %d\n", frame_number);
+        printf("Physical Address: %d\n", physical_address);
     }
 
-    pthread_join(tid[0], NULL);
-    pthread_join(tid[1], NULL);
-    pthread_mutex_destroy(&lock);
     return 0;
 }
