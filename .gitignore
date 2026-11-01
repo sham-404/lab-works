@@ -2,7 +2,7 @@ venv/
 test.py
 bin/
 
-ex_[0-9]*
+ex_*
 !ex_*.*
 
 lex.yy.c
