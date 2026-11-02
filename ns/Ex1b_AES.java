@@ -1,63 +1,61 @@
-import java.io.UnsupportedEncodingException;
+import java.util.*;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
-import javax.crypto.Cipher;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 
 public class Ex1b_AES {
-    private static SecretKeySpec secretKey;
-    private static byte[] key;
 
-    public static void setKey(String myKey) {
-        try {
-            key = myKey.getBytes("UTF-8");
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            key = sha.digest(key);
-            key = Arrays.copyOf(key, 16); // Truncate SHA-1 output to 16 bytes (128 bits)
-            secretKey = new SecretKeySpec(key, "AES");
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+    static SecretKeySpec secretKey;
+
+    static void setKey(String myKey) throws Exception {
+        byte[] key = MessageDigest.getInstance("SHA-1")
+                .digest(myKey.getBytes("UTF-8"));
+
+        key = Arrays.copyOf(key, 16);
+        secretKey = new SecretKeySpec(key, "AES");
     }
 
-    public static String encrypt(String strToEncrypt, String secret) {
-        try {
-            setKey(secret);
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
-        } catch (Exception e) {
-            System.out.println("Error while encrypting: " + e.toString());
-        }
-        return null;
+    static String encrypt(String data, String secret) throws Exception {
+        setKey(secret);
+
+        Cipher c = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        c.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        return Base64.getEncoder().encodeToString(
+                c.doFinal(data.getBytes("UTF-8")));
     }
 
-    public static String decrypt(String strToDecrypt, String secret) {
-        try {
-            setKey(secret);
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
-        } catch (Exception e) {
-            System.out.println("Error while decrypting: " + e.toString());
-        }
-        return null;
+    static String decrypt(String data, String secret) throws Exception {
+        setKey(secret);
+
+        Cipher c = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        c.init(Cipher.DECRYPT_MODE, secretKey);
+
+        return new String(c.doFinal(Base64.getDecoder().decode(data)), "UTF-8");
     }
 
     public static void main(String[] args) {
-        System.out.print("Enter the secret key: ");
-        String secret = System.console().readLine();
-        System.out.print("Enter the original URL: ");
-        String originalString = System.console().readLine();
+        try {
+            Scanner sc = new Scanner(System.in);
 
-        String encryptedString = Ex1b_AES.encrypt(originalString, secret);
-        String decryptedString = Ex1b_AES.decrypt(encryptedString, secret);
+            System.out.print("Enter the secret key: ");
+            String secret = sc.nextLine();
 
-        System.out.println("\nURL Encryption using AES Algorithm\n...");
-        System.out.println("Original URL: " + originalString);
-        System.out.println("Encrypted URL: " + encryptedString);
-        System.out.println("Decrypted URL: " + decryptedString);
+            System.out.print("Enter the original URL: ");
+            String original = sc.nextLine();
+
+            String encrypted = encrypt(original, secret);
+            String decrypted = decrypt(encrypted, secret);
+
+            System.out.println("\nURL Encryption using AES Algorithm\n...");
+            System.out.println("Original URL: " + original);
+            System.out.println("Encrypted URL: " + encrypted);
+            System.out.println("Decrypted URL: " + decrypted);
+
+            sc.close();
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
