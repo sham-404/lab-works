@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RSA Algorithm</title>
+</head>
+<body>
+    <h2>RSA Algorithm</h2>
+    Enter First Prime Number:
+    <input type="number" id="p" value="53"><br><br>
+    Enter Second Prime Number:
+    <input type="number" id="q" value="59"><br><br>
+    Enter Message:
+    <input type="number" id="msg" value="89"><br><br>
+    <button onclick="RSA()">Apply RSA</button>
+
+    <h3 id="result"></h3>
+
+    <script>
+    function gcd(a, b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
+
+    function RSA() {
+        var p = parseInt(document.getElementById("p").value);
+        var q = parseInt(document.getElementById("q").value);
+        var msg = parseInt(document.getElementById("msg").value);
+
+        // 1. Calculate modulus (n) and Euler's Totient phi (t)
+        var n = p * q;
+        var t = (p - 1) * (q - 1);
+
+        // 2. Find smallest public key exponent 'e' coprime to t
+        var e;
+        for (e = 2; e < t; e++) {
+            if (gcd(e, t) == 1) {
+                break;
+            }
+        }
+
+        // 3. Find private key exponent 'd' such that (d * e) % t == 1
+        var d;
+        for (var i = 0; i < 10; i++) {
+            var x = 1 + i * t;
+            if (x % e == 0) {
+                d = x / e;
+                break;
+            }
+        }
+
+        // 4. Encrypt: C = (msg ^ e) % n
+        var cipher = Math.pow(msg, e) % n;
+
+        // 5. Decrypt: M = (cipher ^ d) % n
+        var decrypt = Math.pow(cipher, d) % n;
+
+        // Display results
+        document.getElementById("result").innerHTML =
+            "Public Key: " + n +
+            "<br>Exponent: " + e +
+            "<br>Private Key: " + d +
+            "<br>Cipher Text: " + cipher +
+            "<br>Decrypted Message: " + decrypt;
+    }
+    </script>
+</body>
+</html>
